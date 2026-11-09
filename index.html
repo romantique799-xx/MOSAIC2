@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Made of Others</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="memory"></div>
+
+<script>
+
+const words = [
+  "You taught me how to be brave.",
+  "I still laugh the way you do.",
+  "I learned to leave from you.",
+  "You changed the way I see the world.",
+  "I remember how you made me feel.",
+  "Some of your words became mine.",
+  "I still carry a little of your kindness.",
+  "I became someone different after you."
+];
+
+const colors = [
+  "#F6D5DF", "#E9D9F6", "#CFE5F7",
+  "#D4EEDC", "#FFF0C7", "#FFDDCA",
+  "#DBDDF8", "#F5E0ED", "#D8E9CE"
+];
+
+const memory = document.getElementById("memory");
+
+// Use the visible center, including the floating animation.
+function centerOf(square) {
+  const rect = square.getBoundingClientRect();
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+}
+
+function spreadColor(square, color) {
+  const center = centerOf(square);
+  const neighbors = Array.from(document.querySelectorAll(".square:not(.gone)"))
+    .map(neighbor => {
+      const position = centerOf(neighbor);
+      return {
+        square: neighbor,
+        distance: Math.hypot(position.x - center.x, position.y - center.y)
+      };
+    });
+
+  neighbors.sort((a, b) => a.distance - b.distance);
+  neighbors.slice(0, 3).forEach(neighbor => {
+    neighbor.square.style.backgroundColor = color;
+  });
+}
+
+// Create 45 squares
+for (let i = 0; i < 45; i++) {
+
+  const square = document.createElement("div");
+  square.className = "square";
+
+  // Random position, leaving the center empty
+  let x, y;
+
+  do {
+    x = 5 + Math.random() * 85;
+    y = 5 + Math.random() * 85;
+  } while (x > 25 && x < 75 && y > 30 && y < 70);
+
+  // Random size, color and speed
+  const size = 18 + Math.random() * 32;
+
+  square.style.left = x + "%";
+  square.style.top = y + "%";
+  square.style.width = size + "px";
+  square.style.height = size + "px";
+  square.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+  square.style.animationDuration = (4 + Math.random() * 5) + "s";
+
+  // Click
+  square.onclick = function() {
+    memory.textContent = words[Math.floor(Math.random() * words.length)];
+    memory.style.opacity = 1;
+    const color = getComputedStyle(square).backgroundColor;
+    square.classList.add("gone");
+    spreadColor(square, color);
+  };
+
+  document.body.appendChild(square);
+}
+
+</script>
+</body>
+</html>
